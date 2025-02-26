@@ -1,37 +1,35 @@
-class SudokuValidator:
-    def __init__(self, board):
-        self.board = board
+# Problem: Complex NFA to DFA Conversion
+# Points: 9/10
+# Expected Output: Correct DFA Transition Table
+def nfa_to_dfa(nfa):
+    dfa = {}
+    queue = [frozenset(["q0"])]
+    visited = set()
 
-    def is_valid_sudoku(self):
-        rows = [{}] * 9
-        cols = [{}] * 9
-        boxes = [{}] * 9
-        
-        for i in range(9):
-            for j in range(9):
-                num = self.board[i][j]
-                if num == ".": continue
-                
-                box_index = (i // 3) * 3 + (j / 3)
+    while queue:
+        current = queue.pop(0)
+        if current in visited:
+            continue
+        visited.add(current)
+        dfa[current] = {}
 
-                if num in rows[i] or num in cols[j] or num in boxes[int(box_index)]:
-                    return False
+        for symbol in "01":
+            next_states = set()
+            for state in current:
+                if symbol in nfa.get(state, {}):
+                    next_states.update(nfa[state][symbol])
 
-                rows[i][num] = cols[j][num] = boxes[int(box_index)][num] = True
-        
-        return True
+            next_state = frozenset(next_states)
+            if next_state not in visited:
+                queue.append(next_state)
+            dfa[current][symbol] = next_state  
 
-board = [
-    ["5", "3", ".", ".", "7", ".", ".", ".", "."],
-    ["6", ".", ".", "1", "9", "5", ".", ".", "."],
-    [".", "9", "8", ".", ".", ".", ".", "6", "."],
-    ["8", ".", ".", ".", "6", ".", ".", ".", "3"],
-    ["4", ".", ".", "8", ".", "3", ".", ".", "1"],
-    ["7", ".", ".", ".", "2", ".", ".", ".", "6"],
-    [".", "6", ".", ".", ".", ".", "2", "8", "."],
-    [".", ".", ".", "4", "1", "9", ".", ".", "5"],
-    [".", ".", ".", ".", "8", ".", ".", "7", "9"]
-]
+    return dfa
 
-validator = SudokuValidator(board)
-print(validator.is_valid_sudoku())
+nfa = {
+    "q0": {"0": ["q0", "q1"], "1": ["q0"]},
+    "q1": {"1": ["q2"]},
+    "q2": {}
+}
+
+print(nfa_to_dfa(nfa))

@@ -1,22 +1,34 @@
-class EventEmitter {
+// Problem: TCP Handshake with Incorrect State Transitions
+// Points: 8/10
+// Expected Output: SYN sent, Connection Established, ESTABLISHED
+class TCP {
     constructor() {
-        this.events = {};
+        this.state = "CLOSED";
     }
 
-    on(event, listener) {
-        if (!this.events[event]) this.events[event] = [];
-        this.events[event].push(listener);
+    send_SYN() {
+        if (this.state === "CLOSED") {
+            this.state = "SYN_SENT";
+            console.log("SYN sent");
+        }
     }
 
-    emit(event, ...args) {
-        if (this.events[event]) {
-            this.events[event].forEach(listener => listener(...args));
+    recv_SYN_ACK() {
+        if (this.state === "SYN_SENT") {
+            this.state = "ESTABLISHED"; 
+            console.log("Connection Established");
+        }
+    }
+
+    send_ACK() {
+        if (this.state === "ESTABLISHED") {
+            console.log("ACK Sent, connection stable.");
         }
     }
 }
 
-let emitter = new EventEmitter();
-for (let i = 0; i < 1000000; i++) {
-    emitter.on("data", () => console.log("Event triggered"));
-}
-emitter.emit("data");
+let connection = new TCP();
+connection.send_SYN();
+connection.recv_SYN_ACK();
+console.log(connection.state);
+connection.send_ACK();
