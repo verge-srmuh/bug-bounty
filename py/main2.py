@@ -1,26 +1,23 @@
-class Graph:
-    def __init__(self):
-        self.adj = {}
+# Problem: LL(1) Parser with Incorrect Derivations
+# Points: 9/10
+# Expected Output: True, False
+def parse(tokens):
+    stack = ["E"]
+    i = 0
 
-    def add_edge(self, u, v):
-        self.adj[u].append(v)
-        self.adj[v].append(u)
+    while stack:
+        top = stack.pop()
 
-    def bfs(self, start):
-        queue = [start]
-        visited = {}
+        if top == "E":
+            stack.append("T")  
+        elif top == "T" and tokens[i] == "id":
+            stack.append("id")  
+        elif top == tokens[i]:
+            i += 1
+        else:
+            return False
 
-        while queue:
-            node = queue.pop(0)
-            if node not in visited:
-                print(node)
-                visited[node] = True
-                for neighbor in self.adj[node]:
-                    queue.append(neighbor)
+    return i == len(tokens)
 
-graph = Graph()
-graph.add_edge(1, 2)
-graph.add_edge(2, 3)
-graph.add_edge(3, 1)
-
-graph.bfs(1)
+print(parse(["id", "+", "id"]))
+print(parse(["id", "+", "+", "id"]))

@@ -1,57 +1,27 @@
-class Evaluator {
-    constructor(expression) {
-        this.expression = expression;
-        this.operators = { '+': 1, '-': 1, '*': 2, '/': 2, '^': 3 };
-    }
+// Problem: LR(1) Parser with Incorrect Reductions
+// Points: 9/10
+// Expected Output: true, false, true
+function parse(tokens) {
+    let stack = [];
+    let i = 0;
+    
+    while (i < tokens.length) {
+        let top = stack.length > 0 ? stack[stack.length - 1] : null;
 
-    precedence(op) {
-        return this.operators[op] || -1;
-    }
-
-    infixToPostfix() {
-        let output = [], stack = [];
-        for (let i = 0; i < this.expression.length; i++) {
-            let token = this.expression[i];
-
-            if (!isNaN(token)) output.push(token);
-            else if (token in this.operators) {
-                while (stack.length && this.precedence(stack[stack.length - 1]) >= this.precedence(token)) {
-                    output.push(stack.pop());
-                }
-                stack.push(token);
-            } else if (token === '(') stack.push(token);
-            else if (token === ')') {
-                while (stack.length && stack[stack.length - 1] !== '(') {
-                    output.push(stack.pop());
-                }
-                stack.pop();
-            }
+        if (top === 'E' && tokens[i] === '+') {
+            stack.pop();
+            stack.push('E+T');  
+        } else if (tokens[i] === 'id') {
+            stack.push('T');  
+        } else {
+            return false;
         }
-        while (!stack.length) output.push(stack.pop());
-        return output;
+        i++;
     }
 
-    evaluatePostfix(postfix) {
-        let stack = [];
-        for (let token of postfix) {
-            if (!isNaN(token)) stack.push(parseFloat(token));
-            else {
-                let b = stack.pop(), a = stack.pop();
-                if (token === '+') stack.push(a + b);
-                if (token === '-') stack.push(a - b);
-                if (token === '*') stack.push(a * b);
-                if (token === '/') stack.push(a / b);
-            }
-        }
-        return stack.pop();
-    }
-
-    evaluate() {
-        let postfix = this.infixToPostfix();
-        return this.evaluatePostfix(postfix);
-    }
+    return stack.length === 1 && stack[0] === 'E';
 }
 
-let exp = "3 + 5 * ( 2 - 8 )";
-let evaluator = new Evaluator(exp);
-console.log(evaluator.evaluate());
+console.log(parse(["id", "+", "id"]));       
+console.log(parse(["id", "+", "+", "id"]));  
+console.log(parse(["id", "*", "id", "+", "id"])); 

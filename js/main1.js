@@ -1,41 +1,21 @@
-class DataFetcher {
-    constructor(apiEndpoint) {
-      this.apiEndpoint = apiEndpoint;
-      this.cache = {};
+// Problem: Advanced Regular Expression Matcher (TOC)
+// Points: 8/10
+// Expected Output: true, false, true, false, true
+function isMatch(text, pattern) {
+    if (pattern.length === 0) return text.length === 0;
+
+    let firstMatch = (text.length > 0 && (text[0] === pattern[0] || pattern[0] === '.'));
+
+    if (pattern.length >= 2 && pattern[1] === '*') {
+        return isMatch(text, pattern.substring(2)) ||
+               (firstMatch && isMatch(text.substring(1), pattern));
+    } else {
+        return firstMatch && isMatch(text.substring(1), pattern.substring(1));
     }
-  
-    async fetchData(params) {
-      const query = Object.keys(params)
-        .map(key => `${key}=${params[key]}`)
-        .join('&');
-      const url = `${this.apiEndpoint}?${query}`;
-  
-      if (this.cache[url]) {
-        return this.cache[url]; // Return cached data if available
-      }
-  
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        this.cache[url] = data; // Cache the fetched data
-        return data;
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        return null;
-      }
-    }
-  
-    clearCache() {
-      this.cache = {};
-    }
-  }
-  
-  const fetcher = new DataFetcher('https://api.example.com/data');
-  fetcher.fetchData({ userId: 123, type: 'summary' })
-    .then(data => {
-      console.log('Fetched data:', data);
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
-  
+}
+
+console.log(isMatch("aaab", "a*b"));   
+console.log(isMatch("abc", "a.c"));    
+console.log(isMatch("mississippi", "mis*is*ip*.")); 
+console.log(isMatch("abcd", "d*"));    
+console.log(isMatch("aa", "a*"));      
